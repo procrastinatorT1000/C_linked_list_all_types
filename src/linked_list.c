@@ -7,29 +7,44 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <memory.h>
 #include "linked_list.h"
 
-void push(Node **head, int data)
+void push(Node **head, void *elemPtr, size_t elemSize)
 {
     Node *tmp = (Node*) malloc(sizeof(Node));
-    tmp->value = data;
+    tmp->element.ptr = malloc(elemSize);
+    if(tmp->element.ptr == NULL || tmp == NULL)
+    {
+    	printf("Allocation ERROR!\n");
+    	return;
+    }
+
+    memcpy(tmp->element.ptr, elemPtr, elemSize);
+    tmp->element.size = elemSize;
+
     tmp->next = (*head);
     (*head) = tmp;
 }
 
-int pop(Node **head)
+size_t pop(Node **head, void *elemPtr)
 {
     Node* prev = NULL;
-    int val;
+    size_t size = 0;
     if (head == NULL)
     {
-        exit(-1);
+        printf("List is empty\n");
+        return size;
     }
+
     prev = (*head);
-    val = prev->value;
+    memcpy(elemPtr, prev->element.ptr, prev->element.size);
+    free(prev->element.ptr);
+
+    size = prev->element.size;
     (*head) = (*head)->next;
     free(prev);
-    return val;
+    return size;
 }
 
 void printLinkedList(const Node *head)
@@ -41,7 +56,9 @@ void printLinkedList(const Node *head)
 	}
     while (head)
     {
-        printf("%d ", head->value);
+    	for(int i = 0; i < head->element.size; i++)
+    		printf("%X", ((uint8_t*)head->element.ptr)[i]);
+    	printf(" ");
         head = head->next;
     }
     printf("\n");

@@ -8,13 +8,20 @@
 #ifndef LINKED_LIST_H_
 #define LINKED_LIST_H_
 
-typedef struct Node {
-    int value;
+typedef struct
+{
+	void *ptr;
+	size_t size;
+}Elemen;
+
+typedef struct Node
+{
+	Elemen element;
     struct Node *next;
 } Node;
 
-void push(Node **head, int data);
-int pop(Node **head);
+void push(Node **head, void *elemPtr, size_t elemSize);
+size_t pop(Node **head, void *elemPtr);
 void printLinkedList(const Node *head);
 
 #endif /* LINKED_LIST_H_ */
